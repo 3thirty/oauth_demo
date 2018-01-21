@@ -39,14 +39,14 @@
 <div class='verifier'>
     <p>Oauth verification code is:</p>
 
-    <pre><? if (verifier_looks_ok($_GET['oauth_verifier']) echo $_GET['oauth_verifier']; ?></pre>
+    <pre><?php if (verifier_looks_ok($_GET['oauth_verifier'])) echo $_GET['oauth_verifier']; ?></pre>
 </div>
 
 </body>
 
 </html>
 
-<?
+<?php
 
     /**
      * Do some basic checcking of the oauth_verifier string
@@ -57,13 +57,15 @@
      */
     function verifier_looks_ok ($verifier) {
         // only a-zA-Z0-9 are allowed
-        if (preg_match('/[^a-zA-Z0-9]/', $verifier) !== FALSE) {
+        if (preg_match('/[^a-zA-Z0-9]/', $verifier) !== 0) {
             return false;
         }
 
         if (strlen($verifier) > 60) {
             return false;
         }
+
+        return true;
     }
 
 ?>
