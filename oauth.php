@@ -64,19 +64,19 @@ if (file_exists($CREDENTIALS_CACHE)) {
 
 
 // example api call with oauth
-$test = OauthUtils::make_request('https://api.flickr.com/services/rest',
-    array (
+$test = OauthUtils::make_request(
+    'https://api.flickr.com/services/rest',
+     array (
         'method' => 'flickr.photosets.getList',
         'user_id' => '49743098@N00',
         'oauth_consumer_key' => $CONSUMER_KEY,
         'oauth_consumer_secret' => $CONSUMER_SECRET,
         'oauth_token' => $access_token['oauth_token'],
         'oauth_token_secret' => $access_token['oauth_token_secret'],
-    )
+	)
 );
 
 var_dump($test);
-
 
 /**
  * class to house methods for making Oauth calls
@@ -124,6 +124,7 @@ class OauthUtils {
         }
 
         $ret = curl_exec($ch);
+
         curl_close($ch);
 
         return $ret;
@@ -155,7 +156,7 @@ class OauthUtils {
      * @return string signature to attach to the request
      */
     private static function generate_signature ($url, $args, $method = 'GET') {
-        $base_string = $method . "&" . urlencode($url) . "&" . urlencode(self::build_args_string($args, true));
+        $base_string = $method . "&" . rawurlencode($url) . "&" . rawurlencode(self::build_args_string($args, true));
 
         $key = $args['oauth_consumer_secret'] . "&";
 
@@ -182,13 +183,13 @@ class OauthUtils {
         $kv_args = array();
 
         foreach ($args as $k => $v) {
-            // but secrets should not be part of the base string
-            if (substr($k, (strlen('_secret') * -1)) == '_secret') {
+            // non-scalar values (such as CURLFile objects) are valid, but are not part of the signature
+            if (!is_scalar($v)) {
                 continue;
             }
 
             if ($urlencode) {
-                $v = urlencode($v);
+                $v = rawurlencode($v);
             }
 
             $kv_args[] = "{$k}={$v}";
